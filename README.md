@@ -36,7 +36,69 @@ Step 5: **Security Foundation
 The security of RSA relies on the difficulty of factoring large numbers; thus, choosing sufficiently large prime numbers for \( p \) and \( q \) is crucial for security.
 
 ## Program:
+```
+#include <stdio.h>
 
+int gcd(int a, int b) {
+    while (b) {
+        int temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+int mod_exp(int base, int exp, int mod) {
+    int result = 1;
+    base %= mod;
+    while (exp) {
+        if (exp % 2) result = (result * base) % mod;
+        exp /= 2;
+        base = (base * base) % mod;
+    }
+    return result;
+}
+
+int mod_inverse(int e, int phi) {
+    int t = 0, new_t = 1, r = phi, new_r = e;
+    while (new_r) {
+        int q = r / new_r;
+        t = new_t - q * (new_t = t);
+        r = new_r - q * (new_r = r);
+    }
+    return r > 1 ? -1 : (t < 0 ? t + phi : t);
+}
+
+int main() {
+    int p, q, n, phi, e, d, message;
+
+    printf("Enter two primes (p and q): ");
+    scanf("%d %d", &p, &q);
+
+    n = p * q;
+    phi = (p - 1) * (q - 1);
+
+    do {
+        printf("Enter public key exponent (1 < e < %d, gcd(e, phi) = 1): ", phi);
+        scanf("%d", &e);
+    } while (gcd(e, phi) != 1);
+
+    if ((d = mod_inverse(e, phi)) == -1) {
+        printf("No modular inverse for 'e'.\n");
+        return 1;
+    }
+
+    printf("Public key: (n = %d, e = %d)\nPrivate key: (n = %d, d = %d)\n", n, e, n, d);
+
+    printf("Enter message to encrypt: ");
+    scanf("%d", &message);
+
+    printf("Encrypted: %d\nDecrypted: %d\n", mod_exp(message, e, n), mod_exp(mod_exp(message, e, n), d, n));
+
+    return 0;
+}
+
+```
 
 
 
@@ -44,5 +106,8 @@ The security of RSA relies on the difficulty of factoring large numbers; thus, c
 
 
 
+![image](https://github.com/user-attachments/assets/5dabc437-a933-4abf-a7d6-f5e8b8e0e6ac)
+
+
 ## Result:
- The program is executed successfully.
+ The program is to Implement RSA Encryption Algorithm in Cryptography was executed successfully.
